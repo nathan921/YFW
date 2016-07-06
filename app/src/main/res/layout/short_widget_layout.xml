@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#6688DD">
+
+    <ImageView
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/image_player1"
+        android:src="@android:drawable/arrow_down_float"
+        android:layout_marginRight="8dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/text_player1"
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/image_player1"
+        android:textSize="@dimen/widget_font_size"
+        android:text="Detlef Madarberg"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_player2"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/image_player2"
+        android:layout_width="wrap_content"
+        android:textSize="@dimen/widget_font_size"
+        android:text="Detlef Madarberg"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_player1_score"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/text_player1"
+        android:layout_alignRight="@+id/text_player1"
+        android:textSize="@dimen/widget_font_size"
+        android:text="999.99"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_player2_score"
+        android:layout_below="@+id/text_player2"
+        android:layout_alignLeft="@+id/text_player2"
+        android:layout_width="wrap_content"
+        android:textSize="@dimen/widget_font_size"
+        android:text="999.98"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/image_player2"
+        android:src="@android:drawable/arrow_down_float"
+        android:layout_marginLeft="8dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
+</RelativeLayout>
