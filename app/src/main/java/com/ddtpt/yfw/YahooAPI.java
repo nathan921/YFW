@@ -11,7 +11,7 @@ import rx.Observable;
 public interface YahooAPI {
     String SERVICE_ENDPOINT = "http://fantasysports.yahooapis.com/fantasy/v2";
 
-    @GET("/users;use_login=1?format=json")
+    @GET("/users;use_login=1/games;is_available=1/teams?format=json")
     Observable<JsonElement> getUser();
 
 }

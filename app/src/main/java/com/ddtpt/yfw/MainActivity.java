@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.button_login) Button button_logon;
     @BindView(R.id.text_current_user) TextView textview_user_name;
+    @BindView(R.id.button_test_json) Button button_test_json;
 
     private static final String SECRET = "oauth_secret";
     private static final String TOKEN = "oauth_token";
@@ -58,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 yahooLogonClick();
+            }
+        });
+
+        button_test_json.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testJSONGet();
             }
         });
 
@@ -117,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
                         textview_user_name.setText(s);
                     }
                 });
+
+    }
+
+    private void testJSONGet() {
 
     }
 
