@@ -23,7 +23,7 @@ public class SimpleWidgetProvider extends AppWidgetProvider {
             String number = String.format("%03d", (new Random().nextInt(900) + 100));
 
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                    R.layout.short_widget_layout);
+                    R.layout.short_layout_alt);
             //remoteViews.setTextViewText(R.id.text_player1, number);
 
             Intent intent = new Intent(context, SimpleWidgetProvider.class);

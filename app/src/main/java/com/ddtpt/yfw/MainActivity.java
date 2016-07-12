@@ -1,6 +1,8 @@
 package com.ddtpt.yfw;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,8 +11,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.net.Uri;
 
+import com.google.gson.JsonElement;
+
 import butterknife.BindView;
 
+import butterknife.ButterKnife;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 
 import rx.Observable;
@@ -24,6 +29,14 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.button_login) Button button_logon;
     @BindView(R.id.text_current_user) TextView textview_user_name;
 
+    private static final String SECRET = "oauth_secret";
+    private static final String TOKEN = "oauth_token";
+    private static final String OAUTH_TIMESTAMP = "oauth_timestamp";
+    private static final String OAUTH_NONCE = "oauth_nonce";
+    private static final String OAUTH_SIGNATURE = "oauth_signature";
+    private static final String OAUTH_VERSION = "oauth_version";
+    private static final String OAUTH_SIGNATURE_METHOD = "oauth_signature_method";
+
     Uri tokenUri;
     CommonsHttpOAuthProvider provider;
     RetrofitHttpOAuthConsumer consumer;
@@ -35,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         //Clear the User Name text
         textview_user_name.setText("");
@@ -69,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e("getOauthAccessToken", e.toString());
                 }
+                StoreTokenInPrefs();
             }
         });
 
@@ -103,6 +118,44 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private void StoreTokenInPrefs() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString(TOKEN, consumer.getToken());
+        editor.putString(SECRET, consumer.getTokenSecret());
+        editor.putString(OAUTH_NONCE, consumer.getRequestParameters().getFirst(OAUTH_NONCE));
+        editor.putString(OAUTH_SIGNATURE_METHOD, consumer.getRequestParameters().getFirst(OAUTH_SIGNATURE_METHOD));
+        editor.putString(OAUTH_TIMESTAMP, consumer.getRequestParameters().getFirst(OAUTH_TIMESTAMP));
+
+        editor.commit();
+
+        BuildRestAdapter();
+
+    }
+
+    private void BuildRestAdapter() {
+        //consumer.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
+        YahooAPI service = ServiceFactory.createRetrofitService(YahooAPI.class, YahooAPI.SERVICE_ENDPOINT, consumer);
+        service.getUser()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<JsonElement>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("YahooAPI Demo", e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(JsonElement response) {
+                        Log.i("YahooAPI", response.toString());
+                    }
+                });
     }
 
     private String performYahooLogon() {
