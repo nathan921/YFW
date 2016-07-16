@@ -41,9 +41,11 @@ public class MainActivity extends AppCompatActivity {
     Uri tokenUri;
     CommonsHttpOAuthProvider provider;
     RetrofitHttpOAuthConsumer consumer;
+    YahooAPI service;
 
     Observable<String> yahooLogon;
     Observable<String> getOAuthAccessToken;
+    Observable<Boolean> DetermineIfTokenExists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,26 +131,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testJSONGet() {
-
-    }
-
-    private void StoreTokenInPrefs() {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putString(TOKEN, consumer.getToken());
-        editor.putString(SECRET, consumer.getTokenSecret());
-        editor.putString(OAUTH_NONCE, consumer.getRequestParameters().getFirst(OAUTH_NONCE));
-        editor.putString(OAUTH_SIGNATURE_METHOD, consumer.getRequestParameters().getFirst(OAUTH_SIGNATURE_METHOD));
-        editor.putString(OAUTH_TIMESTAMP, consumer.getRequestParameters().getFirst(OAUTH_TIMESTAMP));
-
-        editor.commit();
-
-        BuildRestAdapter();
-
-    }
-
-    private void BuildRestAdapter() {
-        //consumer.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
-        YahooAPI service = ServiceFactory.createRetrofitService(YahooAPI.class, YahooAPI.SERVICE_ENDPOINT, consumer);
         service.getUser()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -169,6 +151,27 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void StoreTokenInPrefs() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString(TOKEN, consumer.getToken());
+        editor.putString(SECRET, consumer.getTokenSecret());
+        editor.putString(OAUTH_SIGNATURE, consumer.getRequestParameters().getFirst(OAUTH_SIGNATURE));
+        editor.putString(OAUTH_NONCE, consumer.getRequestParameters().getFirst(OAUTH_NONCE));
+        editor.putString(OAUTH_SIGNATURE_METHOD, consumer.getRequestParameters().getFirst(OAUTH_SIGNATURE_METHOD));
+        editor.putString(OAUTH_TIMESTAMP, consumer.getRequestParameters().getFirst(OAUTH_TIMESTAMP));
+
+        editor.commit();
+
+        BuildRestAdapter();
+
+    }
+
+    private void BuildRestAdapter() {
+        //consumer.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
+        service = ServiceFactory.createRetrofitService(YahooAPI.class, YahooAPI.SERVICE_ENDPOINT, consumer);
+    }
+
 
     private String performYahooLogon() {
         String CONSUMER_KEY = "dj0yJmk9RjVUYUZNc1piMzVRJmQ9WVdrOVNGUnJkMFZFTldVbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD02YQ--";
