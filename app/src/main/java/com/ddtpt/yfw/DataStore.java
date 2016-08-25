@@ -1,21 +1,25 @@
 package com.ddtpt.yfw;
 
+import java.util.ArrayList;
+
 /**
  * Created by e228596 on 8/23/2016.
  */
 public class DataStore {
-    private int myTeamId, myMatchupIndex, matchupCount;
-    private Matchup[] matchups;
+    private int myTeamId, myMatchupIndex;
+    private ArrayList<Matchup> matchups;
 
     public DataStore() {
-        matchupCount = 0;
         myMatchupIndex = 0;
         myTeamId = -1;
     }
 
     public void addMatchup(Matchup match) {
-        matchups[matchupCount] = match;
-        matchupCount++;
+        matchups.add(match);
+    }
+
+    public int matchupCount() {
+        return matchups.size();
     }
 
     public int getMyTeamIdByGUID(String user_guid) {
@@ -41,30 +45,12 @@ public class DataStore {
     }
 
     public Matchup getMyMatchup() {
-        return matchups[myMatchupIndex];
+        return matchups.get(myMatchupIndex);
     }
 
-    public Matchup[] getAllMatchup() {
+    public ArrayList<Matchup> getAllMatchup() {
         return matchups;
     }
 
-
-    public class Matchup {
-        private Team home;
-        private Team away;
-
-        public Matchup(Team h, Team a) {
-            home = h;
-            away = a;
-        }
-
-        public Team getHomeTeam() {
-            return home;
-        }
-
-        public Team getAwayTeam() {
-            return away;
-        }
-    }
 
 }

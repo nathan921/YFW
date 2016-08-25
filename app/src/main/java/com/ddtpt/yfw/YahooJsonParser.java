@@ -1,15 +1,16 @@
 package com.ddtpt.yfw;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
 
 /**
  * Created by e228596 on 8/23/2016.
  */
-public class JsonParser {
+public class YahooJsonParser {
     private static final String FANTASY_CONTENT = "fantasy_content";
     private static final String SCOREBOARD = "scoreboard";
     private static final String LEAGUE = "league";
@@ -35,13 +36,21 @@ public class JsonParser {
 
 
 
-    private String JsonString;
+    private JsonElement fullJsonElement;
 
-    public JsonParser() {
-        JsonString = "";
+    public YahooJsonParser() {
+        fullJsonElement = null;
+    }
+    public YahooJsonParser(String json) {
+        fullJsonElement = new JsonParser().parse(json);
     }
 
-    public void parseMatchups(JsonElement response) {
+    public JsonElement getFullJsonElement() {
+        return fullJsonElement;
+    }
+
+    public ArrayList<Matchup> parseMatchups(JsonElement response) {
+        ArrayList<Matchup> parsed_matchups = new ArrayList<>();
         //Gson gson = new GsonBuilder().create();
         int t_id;
         String t_name, t_key, t_image, t_user, t_tpoints, t_projpoints, t_guid;
@@ -69,12 +78,50 @@ public class JsonParser {
             JsonObject teams = match.get(ZERO).getAsJsonObject().get(TEAMS).getAsJsonObject();
 
             Team home, away;
-            int team_count =  teams.get(COUNT).getAsInt();
+            home = null;
+            away = null;
+            int team_count = teams.get(COUNT).getAsInt();
             for (int j = 0; j < team_count; j++) {
                 String team_index = String.valueOf(j);
                 JsonArray team = teams.get(team_index).getAsJsonObject()
                         .get(TEAM).getAsJsonArray();
 
+                t_id = Integer.valueOf(team.get(0).getAsJsonArray()
+                        .get(1).getAsJsonObject()
+                        .get(TEAM_ID).getAsString());
+
+                t_name = team.get(0).getAsJsonArray()
+                        .get(2).getAsJsonObject()
+                        .get(NAME).getAsString();
+
+                t_key = team.get(0).getAsJsonArray()
+                        .get(0).getAsJsonObject()
+                        .get(TEAM_KEY).getAsString();
+
+                t_image = team.get(0).getAsJsonArray()
+                        .get(5).getAsJsonObject()
+                        .get(TEAM_LOGOS).getAsJsonArray()
+                        .get(0).getAsJsonObject()
+                        .get(TEAM_LOGO).getAsJsonObject()
+                        .get(URL).getAsString();
+
+                JsonObject manager_object = team.get(0).getAsJsonArray()
+                        .get(14).getAsJsonObject()
+                        .get(MANAGERS).getAsJsonArray()
+                        .get(0).getAsJsonObject()
+                        .get(MANAGER).getAsJsonObject();
+
+                t_user = manager_object.get(NICKNAME).getAsString();
+
+                t_guid = manager_object.get(GUID).getAsString();
+
+                t_tpoints = team.get(1).getAsJsonObject()
+                        .get(TEAM_POINTS).getAsJsonObject()
+                        .get(TOTAL).getAsString();
+
+                t_projpoints = team.get(1).getAsJsonObject()
+                        .get(TEAM_PROJECTED_POINTS).getAsJsonObject()
+                        .get(TOTAL).getAsString();
 
 
                 if (j == 0) {
@@ -83,8 +130,9 @@ public class JsonParser {
                     away = new Team(t_id, t_name, t_key, t_image, t_user, t_tpoints, t_projpoints, t_guid);
                 }
             }
+            parsed_matchups.add(new Matchup(home, away));
         }
-
+        return parsed_matchups;
     }
 
     private JsonArray pareDownToLeague(JsonElement json) {

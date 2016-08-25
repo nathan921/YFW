@@ -7,12 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
+import java.util.ArrayList;
 import java.util.Random;
+
+import butterknife.BindView;
 
 /**
  * Created by E228596 on 6/27/2016.
  */
 public class SimpleWidgetProvider extends AppWidgetProvider {
+    public static final String ACTION_REFRESH = "com.ddtpt.yfw.ACTION_REFRESH";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -20,7 +24,6 @@ public class SimpleWidgetProvider extends AppWidgetProvider {
 
         for (int i = 0; i < count; i++) {
             int widgetId = appWidgetIds[i];
-            String number = String.format("%03d", (new Random().nextInt(900) + 100));
 
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                     R.layout.short_layout_alt);
@@ -34,6 +37,21 @@ public class SimpleWidgetProvider extends AppWidgetProvider {
             remoteViews.setOnClickPendingIntent(R.id.text_player2, pendingIntent);
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
 
+        }
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+
+        ArrayList<Matchup> matchups = new ArrayList<>();
+        if (intent.getAction().equals(ACTION_REFRESH)) {
+            matchups = (ArrayList<Matchup>) intent.getSerializableExtra("matchups");
+        }
+
+        if (!matchups.isEmpty()) {
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.short_layout_alt);
+            remoteViews.setTextViewText(R.id.text_player1, matchups.get(0).getHomeTeam().getNickname());
         }
     }
 }
