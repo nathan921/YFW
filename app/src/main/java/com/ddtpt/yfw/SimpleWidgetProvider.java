@@ -1,10 +1,16 @@
 package com.ddtpt.yfw;
 
+import android.app.IntentService;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.util.ArrayList;
@@ -16,42 +22,25 @@ import butterknife.BindView;
  * Created by E228596 on 6/27/2016.
  */
 public class SimpleWidgetProvider extends AppWidgetProvider {
-    public static final String ACTION_REFRESH = "com.ddtpt.yfw.ACTION_REFRESH";
+    public static final String LOG_ID = "SimpleWidgetProvider";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+
+        Log.d(LOG_ID, "onUpdate Has Been Called");
         final int count = appWidgetIds.length;
+        SharedPreferences prefs = context.getSharedPreferences("private preferences", Context.MODE_PRIVATE);
 
         for (int i = 0; i < count; i++) {
             int widgetId = appWidgetIds[i];
 
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                    R.layout.short_layout_alt);
-            //remoteViews.setTextViewText(R.id.text_player1, number);
+            //TODO:Do I need to clear this before I start putting in new ones?  Risk of updating non-existant widgets?
+            prefs.edit().putInt("WidgetId" + i, widgetId).commit();
 
             Intent intent = new Intent(context, SimpleWidgetProvider.class);
-            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.text_player2, pendingIntent);
-            appWidgetManager.updateAppWidget(widgetId, remoteViews);
+            context.startService(intent);
 
         }
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
-
-        ArrayList<Matchup> matchups = new ArrayList<>();
-        if (intent.getAction().equals(ACTION_REFRESH)) {
-            matchups = (ArrayList<Matchup>) intent.getSerializableExtra("matchups");
-        }
-
-        if (!matchups.isEmpty()) {
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.short_layout_alt);
-            remoteViews.setTextViewText(R.id.text_player1, matchups.get(0).getHomeTeam().getNickname());
-        }
-    }
 }

@@ -49,7 +49,7 @@ public class YahooJsonParser {
         return fullJsonElement;
     }
 
-    public ArrayList<Matchup> parseMatchups(JsonElement response) {
+    public static ArrayList<Matchup> parseMatchups(JsonElement response) {
         ArrayList<Matchup> parsed_matchups = new ArrayList<>();
         //Gson gson = new GsonBuilder().create();
         int t_id;
@@ -135,7 +135,7 @@ public class YahooJsonParser {
         return parsed_matchups;
     }
 
-    private JsonArray pareDownToLeague(JsonElement json) {
+    private static JsonArray pareDownToLeague(JsonElement json) {
         JsonArray result = json.getAsJsonObject().get(FANTASY_CONTENT)
                 .getAsJsonObject().get(LEAGUE).getAsJsonArray();
         return result;

@@ -12,10 +12,10 @@
 
         <ImageView
             android:id="@+id/player1_avatar"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha=".33"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             android:src="@drawable/test_avatar"  />
 
         <TextView
@@ -48,10 +48,10 @@
 
         <ImageView
             android:id="@+id/player2_avatar"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha=".33"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             android:src="@drawable/gazorp"  />
 
         <TextView
