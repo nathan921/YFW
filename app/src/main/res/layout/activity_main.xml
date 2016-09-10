@@ -23,6 +23,13 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/button_toggle_service"
+        android:layout_above="@+id/button_test_json"
+        android:text="@string/toggle_service_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <Button
         android:id="@+id/button_test_json"
         android:layout_above="@+id/button_login"
         android:text="Test JSON GET"

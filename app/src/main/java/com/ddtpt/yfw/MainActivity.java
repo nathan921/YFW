@@ -1,11 +1,6 @@
 package com.ddtpt.yfw;
 
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,12 +11,13 @@ import android.net.Uri;
 
 import com.google.gson.JsonElement;
 
-import java.util.ArrayList;
 
 import butterknife.BindView;
 
 import butterknife.ButterKnife;
+
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
+
 
 import rx.Observable;
 import rx.Subscriber;
@@ -34,17 +30,18 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.button_login) Button button_logon;
     @BindView(R.id.text_current_user) TextView textview_user_name;
     @BindView(R.id.button_test_json) Button button_test_json;
+    @BindView(R.id.button_toggle_service) Button button_toggle_service;
 
+    private static final String LOG_TAG = "MainActivity";
 
     Uri tokenUri;
     CommonsHttpOAuthProvider provider;
     RetrofitHttpOAuthConsumer consumer;
     YahooAPI service;
 
-    Observable<ArrayList<Matchup>> testJSONParsing;
+    Observable<JsonElement> getJson;
     Observable<String> yahooLogon;
     Observable<String> getOAuthAccessToken;
-    Observable<Boolean> DetermineIfTokenExists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +49,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        UpdateService.setServiceAlarm(this, false);
+
         //Intent intent = new Intent(this, UpdateService.class);
         //this.startService(intent);
-        UpdateService.setServiceAlarm(this, true);
-
 
         //Clear the User Name text
         textview_user_name.setText("");
+
+        if (OAuthFactory.TokenExists(this)) {
+            //service = ServiceFactory.createRetrofitService(YahooAPI.class,
+            //       Strings.BASE_URL,
+            //       OAuthFactory.generateConsumer(Strings.YAHOO, this));
+            //UpdateService.setServiceAlarm(getApplicationContext(), true);
+        }
 
         //OnClickListener for the button that allows the user to logon to Yahoo
         button_logon.setOnClickListener(new View.OnClickListener() {
@@ -71,7 +75,14 @@ public class MainActivity extends AppCompatActivity {
         button_test_json.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                testJSONDecode();
+                jsonTest();
+            }
+        });
+
+        button_toggle_service.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToggleServiceAlarm();
             }
         });
 
@@ -101,18 +112,47 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //TODO: Remove this
-        testJSONParsing = Observable.create(new Observable.OnSubscribe<ArrayList<Matchup>>() {
+        getJson = Observable.create(new Observable.OnSubscribe<JsonElement>() {
             @Override
-            public void call(Subscriber<? super ArrayList<Matchup>> subscriber) {
-                ArrayList<Matchup> temp;
-                YahooJsonParser yparser = new YahooJsonParser(Strings.test_JSON);
-                temp = yparser.parseMatchups(yparser.getFullJsonElement());
-                subscriber.onNext(temp);
+            public void call(Subscriber<? super JsonElement> subscriber) {
+                service.getMatchups()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<JsonElement>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.e(LOG_TAG, e.getMessage());
+                            }
+
+                            @Override
+                            public void onNext(JsonElement jsonElement) {
+                                Log.d(LOG_TAG, "onNext Call from getJson");
+                            }
+                        });
             }
         });
 
+    }
+
+    private void ToggleServiceAlarm() {
+        UpdateService.setServiceAlarm(this, !UpdateService.isServiceAlarmOn(this));
+    }
+
+    private void jsonTest() {
+        if (service == null) {
+            return;
+        }
+        getJson.subscribe(new Action1<JsonElement>() {
+            @Override
+            public void call(JsonElement jsonElement) {
+                Log.d(LOG_TAG, "Got JSON");
+            }
+        });
     }
 
     @Override
@@ -137,81 +177,23 @@ public class MainActivity extends AppCompatActivity {
         yahooLogon
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        textview_user_name.setText(s);
-                    }
-                });
-
+                .subscribe();
     }
 
-    //TODO: This will need to be removed from the MainActivity
-    private void testJSONDecode() {
-        Log.d("Service Check", String.valueOf(UpdateService.isServiceAlarmOn(this)));
-
-        testJSONParsing
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<ArrayList<Matchup>>() {
-                    @Override
-                    public void onNext(ArrayList<Matchup> matchups) {
-                        textview_user_name.setText(matchups.get(0).getHomeTeam().getNickname());
-                    }
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("YahooAPI Demo", e.getMessage());
-                    }
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-                });
-
-    }
-
-    //TODO: This will need to be removed from the MainActivity
-    private void testJSONGet() {
-        service.getUser()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<JsonElement>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("YahooAPI Demo", e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(JsonElement response) {
-                        Log.i("YahooAPI", response.toString());
-                    }
-                });
+    public void ServiceRunning() {
+        Log.d(LOG_TAG, "Service Running: " + UpdateService.isServiceAlarmOn(this));
     }
 
     private void StoreTokenInPrefs() {
         OAuthFactory.StoreTokenInPrefs(consumer, this);
-
-        BuildRestAdapter();
-
+        service = ServiceFactory.createRetrofitService(YahooAPI.class, Strings.BASE_URL, consumer);
+        //UpdateService.setServiceAlarm(getApplicationContext(), true);
     }
-
-    private void BuildRestAdapter() {
-        //consumer.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
-        service = ServiceFactory.createRetrofitService(YahooAPI.class, YahooAPI.SERVICE_ENDPOINT, consumer);
-    }
-
 
     private String performYahooLogon() {
 
         String TAG = "OAUTH";
 
-        String results = "";
         consumer = OAuthFactory.generateConsumer(Strings.YAHOO);
         provider = OAuthFactory.generateProvider(Strings.YAHOO);
 

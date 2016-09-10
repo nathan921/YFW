@@ -29,6 +29,22 @@
             android:layout_height="wrap_content" />
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/player1_projected_score"
+            android:layout_gravity="bottom|right"
+            android:text="999.99"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:textSize="14dp"
+
+            />
+
+        <TextView
             android:id="@+id/player1_score"
             android:text="999.99"
             android:layout_gravity="bottom|left"
@@ -67,6 +83,22 @@
             android:textSize="@dimen/widget_font_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/player2_projected_score"
+            android:text="999.99"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_gravity="bottom|left"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="14dp"
+
+            />
 
         <TextView
             android:shadowColor="#000000"

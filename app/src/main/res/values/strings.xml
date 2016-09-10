@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">YFW</string>
+    <string name="not_signed_in">Sign In To See Weekly Scores</string>
+    <string name="toggle_service_refresh">Toggle Service Refresh</string>
 </resources>

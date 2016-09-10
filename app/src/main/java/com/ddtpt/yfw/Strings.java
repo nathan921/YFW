@@ -19,9 +19,13 @@ public class Strings {
 
     public static final String YAHOO = "yahoo";
     public static final String ESPN = "espn";
+    public static final String BASE_URL = "http://fantasysports.yahooapis.com";
     public static final String YAHOO_GET_REQUEST_TOKEN_URL = "https://api.login.yahoo.com/oauth/v2/get_request_token";
     public static final String YAHOO_GET_TOKEN_URL = "https://api.login.yahoo.com/oauth/v2/get_token";
     public static final String YAHOO_REQUEST_AUTH_URL = "https://api.login.yahoo.com/oauth/v2/request_auth";
+
+    public static final String SERVICE_ENDPOINT = "http://fantasysports.yahooapis.com/fantasy/v2";
+
 
 
 

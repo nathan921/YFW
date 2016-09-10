@@ -106,7 +106,7 @@ public class YahooJsonParser {
                         .get(URL).getAsString();
 
                 JsonObject manager_object = team.get(0).getAsJsonArray()
-                        .get(14).getAsJsonObject()
+                        .get(19).getAsJsonObject()
                         .get(MANAGERS).getAsJsonArray()
                         .get(0).getAsJsonObject()
                         .get(MANAGER).getAsJsonObject();
